@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     Bitmap bitmap;
     String encodeImageString;
 
-    private static final String url="http://192.168.1.9/rapiNotis/fileupload.php";
+    private static final String url="http://192.168.1.9:8080/rapiNotis/fileupload.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,9 +150,12 @@ public class MainActivity extends AppCompatActivity {
         final String tipo=t1.getText().toString().trim();
         final String titulo=t2.getText().toString().trim();
         final String noticia=t3.getText().toString().trim();
-        
+
+
 
         StringRequest request=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+
             @Override
             public void onResponse(String response) {
                 t1.setText("");
@@ -159,9 +163,6 @@ public class MainActivity extends AppCompatActivity {
                 t3.setText("");
                 img.setImageResource(R.drawable.ic_launcher_foreground);
                 Toast.makeText(getApplicationContext(),response.toString(),Toast.LENGTH_LONG).show();
-
-
-
 
             }
         }, new Response.ErrorListener() {
@@ -179,14 +180,13 @@ public class MainActivity extends AppCompatActivity {
                 map.put("t2",titulo);
                 map.put("t3",noticia);
                 map.put("upload",encodeImageString);
-
-
                 return map;
             }
         };
-
-
-
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
         queue.add(request);
 
