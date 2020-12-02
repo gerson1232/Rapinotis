@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">RapiNotis</string>
+    <string name="iniciar_seseion">Iniciar Sesion</string>
+    <string name="registrate">Registrarse</string>
+    <string name="contra">Contraseña</string>
+    <string name="usuario">Usuario</string>
 </resources>

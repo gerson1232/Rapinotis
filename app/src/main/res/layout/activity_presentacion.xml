@@ -21,70 +21,71 @@
             android:layout_height="match_parent"
             >
             <!--NAcionales -->
+
             <LinearLayout
 
                 android:id="@+id/tab1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                >
-                <LinearLayout
-                    android:id="@+id/lyt1"
+                android:background="#7899EC">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvLista"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@color/white">
+                    android:layout_height="match_parent"
+                    android:text="Hola que tal"
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvLista"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="Hola que tal"
+                    >
 
-                        >
-
-                    </androidx.recyclerview.widget.RecyclerView>
-
-
-
-
-
-                </LinearLayout>
-
-
-
-
+                </androidx.recyclerview.widget.RecyclerView>
 
 
             </LinearLayout>
-            <!-- Internacionales -->
+
             <LinearLayout
 
                 android:id="@+id/tab2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="#1FBC26">
+                android:background="#3F51B5"
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvListaInter"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Hola que tal"/>
+                    android:text="Hola que tal"
+
+                    >
+
+                </androidx.recyclerview.widget.RecyclerView>
 
             </LinearLayout>
-
-            <!--Deportes -->
 
             <LinearLayout
 
                 android:id="@+id/tab3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@color/teal_700">
+                android:background="@color/teal_700"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvListDeportes"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Hola que tal"
+
+                    >
+
+                </androidx.recyclerview.widget.RecyclerView>
 
             </LinearLayout>
 
+            <!-- Internacionales -->
+
+            <!--Deportes -->
 
 
         </FrameLayout>

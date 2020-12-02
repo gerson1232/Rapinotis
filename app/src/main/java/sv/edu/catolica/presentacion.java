@@ -7,69 +7,256 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 import android.widget.TabHost;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
-import sv.edu.catolica.adapter.RecyclerAdapter;
-import sv.edu.catolica.model.Itemlis;
 
-public class presentacion extends AppCompatActivity implements RecyclerAdapter.RecyclerItemClick, SearchView.OnQueryTextListener{
-    private RecyclerView rvLista;
+public class presentacion extends AppCompatActivity {
+    private RecyclerView rvLista, rvListaInternacionales, rvListaDeportes;
+    private RecyclerView.Adapter mAdapter;
     private SearchView svSearch;
-    private RecyclerAdapter adapter;
-    private List<Itemlis> items;
+    ArrayList<JasonDataList> arrayList;
+    ArrayList<JasonDataList1> arrayList1;
+    ArrayList<JasonDataList2> arrayList2;
+    private final String URL_INTERNACIONALES="http://192.168.1.9:8080/rapiNotis/buscarNoticiaInternacionales.php";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_presentacion);
+        rvLista = findViewById(R.id.rvLista);
+        rvLista.setHasFixedSize(true);
+        rvLista.setLayoutManager(new LinearLayoutManager(this));
+        rvListaInternacionales = findViewById(R.id.rvListaInter);
+        rvListaInternacionales.setHasFixedSize(true);
+        rvListaInternacionales.setLayoutManager(new LinearLayoutManager(this));
+        rvListaDeportes = findViewById(R.id.rvListDeportes);
+        rvListaDeportes.setHasFixedSize(true);
+        rvListaDeportes.setLayoutManager(new LinearLayoutManager(this));
+
+        arrayList = new ArrayList<JasonDataList>();
+        arrayList1 = new ArrayList<JasonDataList1>();
+        arrayList2 = new ArrayList<JasonDataList2>();
+
+        JsonFetch jsonFetch = new JsonFetch();
+        jsonFetch.execute();
+
+        JsonFetchs jsonFetchs = new JsonFetchs();
+        jsonFetchs.execute();
+
+        JsonFetchsc jsonFetchsc = new JsonFetchsc();
+        jsonFetchsc.execute();
+
+
         Llenar();
-        initViews();
-        initvalues();
-    }
-
-    private void initvalues(){
-        LinearLayoutManager manager =new LinearLayoutManager(this);
-        rvLista.setLayoutManager(manager);
-        items = getItems();
-        adapter= new RecyclerAdapter(items, this);
-        rvLista.setAdapter(adapter);
-
 
     }
 
-    private void initViews() {
-        rvLista =findViewById(R.id.rvLista);
-    }
-    private List<Itemlis> getItems() {
-        List<Itemlis> itemLists = new ArrayList<>();
-        itemLists.add(new Itemlis("Saga de Broly", "Ultima pelicula de DB, peleas epicas.", R.drawable.deportes));
+    public class JsonFetchs extends AsyncTask<String,String,String>{
+        HttpURLConnection httpURLConnection = null;
+        String mainfile;
 
-        return itemLists;
-    }
-    @Override
-    public void itemClick(Itemlis item) {
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("itemDetail", item);
-        startActivity(intent);
-    }
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                URL url = new URL("http://192.168.1.9:8080/rapiNotis/buscarNoticia.php");
+                httpURLConnection=(HttpURLConnection) url.openConnection();
+                httpURLConnection.connect();
+
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuffer stringBuffer = new StringBuffer();
+
+                String line="";
+                while ((line=bufferedReader.readLine())!=null ){
+                    stringBuffer.append(line);
+                }
+
+                mainfile= stringBuffer.toString();
+
+                JSONArray parent = new JSONArray(mainfile);
+
+                 int i = 0;
+                 while (i<= parent.length()){
+                     JSONObject child = parent.getJSONObject(i);
+                     String titulo = child.getString("titulo");
+                     String noticia = child.getString("noticia");
+                     String img = child.getString("imagen");
+
+
+                     arrayList.add(new JasonDataList(titulo,noticia,img));
+                     i++;
+                 }
+
+            }catch (MalformedURLException | JSONException e){
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+
+          JsonAdapter jsonAdapter = new JsonAdapter(arrayList,getApplicationContext());
+            rvLista.setAdapter(jsonAdapter);
+
+
+
+
+        }
     }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        adapter.filter(newText);
-        return false;
+    public class JsonFetch extends AsyncTask<String,String,String>{
+        HttpURLConnection httpURLConnection = null;
+        String mainfiles;
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                URL url = new URL("http://192.168.1.9:8080/rapiNotis/buscarNoticiaInternacionales.php");
+                httpURLConnection=(HttpURLConnection) url.openConnection();
+                httpURLConnection.connect();
+
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuffer stringBuffer = new StringBuffer();
+
+                String line="";
+                while ((line=bufferedReader.readLine())!=null ){
+                    stringBuffer.append(line);
+                }
+
+                mainfiles= stringBuffer.toString();
+
+                JSONArray parent = new JSONArray(mainfiles);
+
+                int i = 0;
+                while (i<= parent.length()){
+                    JSONObject child = parent.getJSONObject(i);
+                    String titulo = child.getString("titulo");
+                    String noticia = child.getString("noticia");
+                    String img = child.getString("imagen");
+
+
+                    arrayList1.add(new JasonDataList1(titulo,noticia,img));
+                    i++;
+                }
+
+            }catch (MalformedURLException | JSONException e){
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+
+            JsonAdapter1 jsonAdapter1 = new JsonAdapter1(arrayList1,getApplicationContext());
+            rvListaInternacionales.setAdapter(jsonAdapter1);
+
+
+
+
+        }
     }
+
+    public class JsonFetchsc extends AsyncTask<String,String,String>{
+        HttpURLConnection httpURLConnection = null;
+        String mainfiles;
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                URL url = new URL("http://192.168.1.9:8080/rapiNotis/buscarNoticiaDeportes.php");
+                httpURLConnection=(HttpURLConnection) url.openConnection();
+                httpURLConnection.connect();
+
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuffer stringBuffer = new StringBuffer();
+
+                String line="";
+                while ((line=bufferedReader.readLine())!=null ){
+                    stringBuffer.append(line);
+                }
+
+                mainfiles= stringBuffer.toString();
+
+                JSONArray parent = new JSONArray(mainfiles);
+
+                int i = 0;
+                while (i<= parent.length()){
+                    JSONObject child = parent.getJSONObject(i);
+                    String titulo = child.getString("titulo");
+                    String noticia = child.getString("noticia");
+                    String img = child.getString("imagen");
+
+
+                    arrayList2.add(new JasonDataList2(titulo,noticia,img));
+                    i++;
+                }
+
+            }catch (MalformedURLException | JSONException e){
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String s){
+            super.onPostExecute(s);
+
+            JsonAdapter2 jsonAdapter2 = new JsonAdapter2(arrayList2,getApplicationContext());
+            rvListaDeportes.setAdapter(jsonAdapter2);
+
+
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
     public void Llenar(){
